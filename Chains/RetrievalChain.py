@@ -1,7 +1,7 @@
 from langchain_chroma import Chroma
 
 from Embeddings.EmbeddingModel import embeddings
-from ChatModels.OpenRouterLLM import llm
+from ChatModels.OpenRouterLLM import llm, llm2
 from Prompts.RagPrompt import rag_prompt
 
 
@@ -30,6 +30,6 @@ def ask_question(question: str):
         }
     )
 
-    response = llm.invoke(prompt)
+    response = llm2.invoke(prompt)
 
     return response.content

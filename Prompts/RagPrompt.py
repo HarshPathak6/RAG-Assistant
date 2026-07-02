@@ -4,19 +4,16 @@ rag_prompt = ChatPromptTemplate.from_template(
 """
 You are a helpful AI assistant.
 
-Use ONLY the context below to answer.
+Use the retrieved context as your primary source.
 
-If the answer is not found in the context,
-reply with:
+If the answer exists in the context, answer using it.
 
-"I couldn't find that information in the uploaded document."
+If the context is incomplete, use your own general knowledge to provide a correct answer, but clearly distinguish which parts come from your own knowledge.
 
-Context:
+Retrieved Context:
 {context}
 
 Question:
 {question}
-
-Answer:
 """
 )
