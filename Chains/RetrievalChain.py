@@ -1,27 +1,36 @@
 from langchain_chroma import Chroma
-
 from Embeddings.EmbeddingModel import embeddings
 from ChatModels.OpenRouterLLM import llm, llm2
 from Prompts.RagPrompt import rag_prompt
-
 
 vector_store = Chroma(
     persist_directory="chroma_db",
     embedding_function=embeddings
 )
 
-retriever = vector_store.as_retriever(
-    search_kwargs={"k": 3}
-)
-
 
 def ask_question(question: str):
 
-    docs = retriever.invoke(question)
-
-    context = "\n\n".join(
-        doc.page_content for doc in docs
+    # Semantic search
+    docs = vector_store.similarity_search_with_score(
+        question,
+        k=4
     )
+
+    context = ""
+
+    citations = []
+
+    for doc, score in docs:
+
+        context += doc.page_content + "\n\n"
+
+        citations.append(
+            {
+                "document": doc.metadata.get("source", "Unknown"),
+                "page": doc.metadata.get("page", 0)
+            }
+        )
 
     prompt = rag_prompt.invoke(
         {
@@ -32,4 +41,8 @@ def ask_question(question: str):
 
     response = llm2.invoke(prompt)
 
-    return response.content
+    return {
+        "question": question,
+        "answer": response.content,
+        "citations": citations
+    }
